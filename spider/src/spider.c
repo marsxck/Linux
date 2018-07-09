@@ -26,16 +26,61 @@ char* Load_Config(char* path,char* key)
     fclose(pf);
     return NULL;
 }
-void Init_Url_t(url_t* url,int port)
+//初始化结构体
+void Init_Url_t(url_t* url)
 {
     bzero(url,sizeof(url_t));
-    url->port=port;
+    url->port=80;
 }
-
+//url分析器
+int Url_analytic(url_t* u)
+{
+    if(u==NULL)
+        return 1;
+    int i;
+    int j=0;
+    int nStart=0;
+    char* p;
+    //解析域名
+    char* htt[]={"http://","https://"};
+    for(i=0;i<2;i++)
+    {
+        if(strncmp(u->url,htt[i],strlen(htt[i]))==0)
+        {
+            nStart=strlen(htt[i]);
+            break;
+        }
+    }
+    if(nStart==0) return 2;
+    for(i=nStart;u->url[i]!='/'&&u->url[i];i++,j++)
+    {
+        u->domain[j]=u->url[i];
+    }
+    //解析路径
+    j=0;
+    for(i=nStart;u->url[i]!='\0';i++,j++)
+    {
+        u->path[j]=u->url[i];
+    }
+    //是否特殊端口
+    p=strstr(u->domain,":");
+    if(p)
+    {
+        printf("1111");
+        sscanf(p,":%d",&u->port);
+        p[0]='\0';
+        //sprintf((char*)&(u->port),":%d",u->domain);
+    }
+    return 0;
+}
 int main()
 {
-    printf("%s",Load_Config("../conf/spider.ini","URL"));
+    char* value=Load_Config("../conf/spider.ini","URL");
     url_t *pUrl=(url_t*)malloc(sizeof(url_t));
-    Init_Url_t(pUrl,80);
+    Init_Url_t(pUrl);
+    strncpy(pUrl->url,value,strlen(value)-1);
+    if(Url_analytic(pUrl))
+        printf("URL analy error");
+    printf("%s\n%s\n%s\n%d\n",pUrl->url,pUrl->domain,pUrl->path,pUrl->port);
     free(pUrl);
 }

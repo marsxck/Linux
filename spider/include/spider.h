@@ -10,10 +10,10 @@ typedef struct{
     char url[URLSIZE];//配置文件获取
     char domain[DOMAIN];//域名
     char ip[IP];//主机ip
-    char name[NAME];//资源名
+    char path[NAME];//资源名
     int port;
 }url_t;
-void Init_Url_t(url_t*,int port);//初始化结构体
+void Init_Url_t(url_t*);//初始化结构体
 int Url_analytic(url_t*);//解析域名
 char* Get_ip(char*);
 int Create_http_head(url_t*,char*);
