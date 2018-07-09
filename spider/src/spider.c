@@ -1,4 +1,5 @@
 #include<spider.h>
+#include<errno.h>
 //加载配置文件
 char* Load_Config(char* path,char* key)
 {
@@ -6,7 +7,11 @@ char* Load_Config(char* path,char* key)
     char* value=NULL;
     size_t len=0;
     char* p=NULL;
-    pf=fopen(path,"r");
+    pf=fopen(path,"r+");
+    if(pf==NULL)
+    {
+        printf("%s\n",strerror(errno));
+    }
     while(getline(&value,&len,pf)!=-1)//读一行
     {
         if(value[0]=='#'||value[0]==';'||value[0]=='[')
@@ -23,7 +28,8 @@ char* Load_Config(char* path,char* key)
             return value;
         }
     }
-    fclose(pf);
+    if(pf!=NULL)
+        fclose(pf);
     return NULL;
 }
 //初始化结构体
@@ -69,13 +75,12 @@ int Url_analytic(url_t* u)
         printf("1111");
         sscanf(p,":%d",&u->port);
         p[0]='\0';
-        //sprintf((char*)&(u->port),":%d",u->domain);
     }
     return 0;
 }
 int main()
 {
-    char* value=Load_Config("../conf/spider.ini","URL");
+    char* value=Load_Config("./conf/spider.ini","URL");
     url_t *pUrl=(url_t*)malloc(sizeof(url_t));
     Init_Url_t(pUrl);
     strncpy(pUrl->url,value,strlen(value)-1);
@@ -83,4 +88,5 @@ int main()
         printf("URL analy error");
     printf("%s\n%s\n%s\n%d\n",pUrl->url,pUrl->domain,pUrl->path,pUrl->port);
     free(pUrl);
+    return 0;
 }
