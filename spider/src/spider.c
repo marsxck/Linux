@@ -1,8 +1,10 @@
 #include<spider.h>
-#include<errno.h>
 //加载配置文件
 char* Load_Config(char* path,char* key)
 {
+    if(path==NULL||key==NULL)
+        return "error";
+    printf("加载配置中...\n");
     FILE* pf=NULL;
     char* value=NULL;
     size_t len=0;
@@ -43,6 +45,7 @@ int Url_analytic(url_t* u)
 {
     if(u==NULL)
         return 1;
+    printf("URL解析中.......\n");
     int i;
     int j=0;
     int nStart=0;
@@ -72,11 +75,51 @@ int Url_analytic(url_t* u)
     p=strstr(u->domain,":");
     if(p)
     {
-        printf("1111");
         sscanf(p,":%d",&u->port);
         p[0]='\0';
     }
+    //获取ip
+    if(Get_ip(u)!=0)
+    {
+        printf("ip get error");
+    }
     return 0;
+}
+//获取域名对应ip
+int Get_ip(url_t* u)
+{
+    struct hostent* ent;
+    ent=gethostbyname(u->domain);
+    if(ent)
+    {
+        inet_ntop(AF_INET,ent->h_addr_list[0],u->ip,16);
+        return 0;
+    }
+    return -1;
+}
+//连接webserver
+int Connect(url_t* u)
+{
+    if(u==NULL) return -1;
+    printf("连接%s:%d %s中.....\n",u->domain,u->port,u->ip);
+    int socketfd;
+    int res;
+    socketfd=socket(AF_INET,SOCK_STREAM,0);
+    if(socketfd==-1)
+        printf("%s\n",strerror(errno));
+    struct sockaddr_in addrserver;
+    bzero(&addrserver,sizeof(struct sockaddr_in));
+    addrserver.sin_family=AF_INET;
+    inet_pton(AF_INET,u->ip,&addrserver.sin_addr.s_addr);
+    addrserver.sin_port=htons(u->port);
+    res=connect(socketfd,(struct sockaddr*)&addrserver,sizeof(addrserver));
+    if(res==-1)
+    {
+        printf("连接失败\n");
+        printf("%s\n",strerror(errno));
+        return -1;
+    }
+    return socketfd;
 }
 int main()
 {
@@ -86,7 +129,8 @@ int main()
     strncpy(pUrl->url,value,strlen(value)-1);
     if(Url_analytic(pUrl))
         printf("URL analy error");
-    printf("%s\n%s\n%s\n%d\n",pUrl->url,pUrl->domain,pUrl->path,pUrl->port);
+    printf("%s\n%s\n%s\n%d\n%s\n",pUrl->url,pUrl->domain,pUrl->path,pUrl->port,pUrl->ip);
+    Connect(pUrl);
     free(pUrl);
     return 0;
 }
