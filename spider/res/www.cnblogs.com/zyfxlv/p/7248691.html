@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ajax请求Spring Mvc 时总是返回 302 Moved Temporarily - Carina_zy - 博客园</title>
+<link type="text/css" rel="stylesheet" href="/bundles/blog-common.css?v=PX31qVjOE47mNaZI9JUSFK-ajuzMnpXA9PeteRNR1Qw1"/>
+<link id="MainCss" type="text/css" rel="stylesheet" href="/skins/clover/bundle-clover.css?v=ysbMD_tG88uRfQuhBDLbRjiNM_9XhcM_04JlSPFdU9w1"/>
+<link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="/skins/clover/bundle-clover-mobile.css?v=d9LctKHRIQp9rreugMcQ1-UJuq_j1fo0GZXTXj8Bqrk1"/>
+<link title="RSS" type="application/rss+xml" rel="alternate" href="http://www.cnblogs.com/zyfxlv/rss"/>
+<link title="RSD" type="application/rsd+xml" rel="EditURI" href="http://www.cnblogs.com/zyfxlv/rsd.xml"/>
+<link type="application/wlwmanifest+xml" rel="wlwmanifest" href="http://www.cnblogs.com/zyfxlv/wlwmanifest.xml"/>
+<script src="//common.cnblogs.com/scripts/jquery-2.2.0.min.js"></script>
+<script type="text/javascript">var currentBlogApp = 'zyfxlv', cb_enable_mathjax=false;var isLogined=false;</script>
+<script src="/bundles/blog-common.js?v=oFpq70v3U1-c9rdP99iicoTFTCbQZF5NZNtH0AloVxg1" type="text/javascript"></script>
+</head>
+<body>
+<a name="top"></a>
+
+<!--done-->
+<TABLE cellpadding="0" cellspacing="0" border="0" align="center" width="100%">
+<TR>
+	<TD width=299 background="/skins/clover/images/banner1.jpg"></TD>
+	<TD background="/skins/clover/images/banner.jpg">
+<!--done-->
+<div class="header">
+	<div class="headerText">
+		<a id="Header1_HeaderTitle" class="headermaintitle" href="http://www.cnblogs.com/zyfxlv/">安静的做好一个程序员！</a><br>
+		
+	</div>
+</div>
+</TD>
+	<TD width=296 background="/skins/clover/images/banner2.jpg"></TD>
+</TR>
+</TABLE>
+<div id="mylinks"><a id="blog_nav_sitehome" class="menu" href="http://www.cnblogs.com/">博客园</a>&nbsp; &nbsp;
+<a id="blog_nav_myhome" class="menu" href="http://www.cnblogs.com/zyfxlv/">首页</a>&nbsp; &nbsp;
+<a href="http://q.cnblogs.com/" class="menu" target="_blank">博问</a>&nbsp; &nbsp;
+<a href="http://home.cnblogs.com/ing/" class="menu" target="_blank">闪存</a>&nbsp; &nbsp;
+<a id="blog_nav_newpost" class="menu" rel="nofollow" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">新随笔</a>&nbsp; &nbsp;
+<a id="blog_nav_rss" class="menu" href="http://www.cnblogs.com/zyfxlv/rss">订阅</a>
+<a id="blog_nav_rss_image" href="http://www.cnblogs.com/zyfxlv/rss"><img src="//www.cnblogs.com/images/xml.gif" alt="订阅" /></a>&nbsp; &nbsp;
+<a id="blog_nav_admin" class="menu" rel="nofollow" href="https://i.cnblogs.com/">管理</a>
+<!-- <a id="blog_nav_contact" accesskey="9" class="menu" rel="nofollow" href="https://msg.cnblogs.com/send/Carina_zy">联系</a>&nbsp;&nbsp;&nbsp; -->
+</div>
+<div id="mytopmenu">
+	
+		<DIV id="mystats">
+			<div id="blog_stats">
+<!--done-->
+<div class="blogStats">
+posts - 21,&nbsp;
+comments - 17,&nbsp;
+trackbacks - 0
+
+</div></div></DIV>
+	
+</div>
+<div id="centercontent">
+	
+<div id="post_detail">
+<!--done-->
+<div class = "post">
+	<div class = "postTitle">
+		<a id="cb_post_title_url" class="postTitle2" href="https://www.cnblogs.com/zyfxlv/p/7248691.html">Ajax请求Spring Mvc 时总是返回 302 Moved Temporarily</a>
+	</div>
+	<div id="cnblogs_post_body" class="blogpost-body"><p>功能上主要是实现在前台点击保存按钮，单元格变成文本框，修改值后请求后台保存数据。但在做的过程中，ajax 请求总是不能请求到后。打开浏览器调试，查看到http状态码总是返回<strong><span style="color: #ff0000; font-size: 18pt;"> http/1.1</span></strong>&nbsp;&nbsp;<span style="color: #ff0000;"><span style="font-size: 18pt;"><strong>302 Moved Temporarily</strong></span>.</span> &nbsp;在网上查看解释给的是: &nbsp;</p>
+<pre>你所连接的页面进行了Redirect </pre>
+<pre>302 Found 类似于301，但新的URL应该被视为临时性的替代，而不是永久性的。注意，在HTTP1.0中对应的状态信息是&ldquo;Moved Temporatily&rdquo;，而HttpServletResponse中相应的常量是SC_MOVED_TEMPORARILY，而不是SC_FOUND。出现该状态代码时，浏览器能够自动访问新的URL，因此它是一个很有用的状态代码。为此，Servlet提供了一个专用的方法，即sendRedirect。使用response.sendRedirect(url)比使用response.setStatus(response.SC_MOVED_TEMPORARILY)和response.setHeader("Location",url)更好。这是因为： 
+
+首先，代码更加简洁。 
+第二，使用sendRedirect，Servlet会自动构造一个包含新链接的页面（用于那些不能自动重定向的老式浏览器）。 
+最后，sendRedirect能够处理相对URL，自动把它们转换成绝对URL。 
+注意这个状态代码有时候可以和301替换使用。例如，如果浏览器错误地请求http://host/~user（缺少了后面的斜杠），有的服务器返回301，有的则返回302。 
+严格地说，我们只能假定只有当原来的请求是GET时浏览器才会自动重定向。
+参考资料： http://zhidao.baidu.com/question/16119833.html?si=4</pre>
+<p>调试许久找到问题所在。主要是后台controller 方法中添加了AvoidDuplicatSubmission 的注解</p>
+<p><img src="https://images2017.cnblogs.com/blog/442090/201707/442090-20170728095323383-906772704.png" alt="" width="1078" height="389" /></p>
+<p>&nbsp;</p>
+<p>ajax 请求</p>
+<p><img src="https://images2017.cnblogs.com/blog/442090/201707/442090-20170728095433071-1002089087.png" alt="" /></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>java 后台controller 方法</p>
+<p><img src="https://images2017.cnblogs.com/blog/442090/201707/442090-20170728095505055-362493828.png" alt="" /></p>
+<p>&nbsp;</p>
+<p>解决问题的方法就是去掉controller 方法中，红色框框的注解。</p>
+<p>&nbsp;</p></div><div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block">
+<div id="BlogPostCategory"></div>
+<div id="EntryTag"></div>
+<div id="blog_post_info">
+</div>
+<div class="clear"></div>
+<div id="post_next_prev"></div>
+</div>
+
+
+	<div class = "postDesc">posted on <span id="post-date">2017-07-28 10:03</span> <a href='http://www.cnblogs.com/zyfxlv/'>Carina_zy</a> 阅读(<span id="post_view_count">...</span>) 评论(<span id="post_comment_count">...</span>)  <a href ="https://i.cnblogs.com/EditPosts.aspx?postid=7248691" rel="nofollow">编辑</a> <a href="#" onclick="AddToWz(7248691);return false;">收藏</a></div>
+</div>
+<script type="text/javascript">var allowComments=true,cb_blogId=126916,cb_entryId=7248691,cb_blogApp=currentBlogApp,cb_blogUserGuid='3320946f-edf0-e111-aa3f-842b2b196315',cb_entryCreatedDate='2017/7/28 10:03:00';loadViewCount(cb_entryId);var cb_postType=1;</script>
+
+</div><a name="!comments"></a><div id="blog-comments-placeholder"></div><script type="text/javascript">var commentManager = new blogCommentManager();commentManager.renderComments(0);</script>
+<div id='comment_form' class='commentform'>
+<a name='commentform'></a>
+<div id='divCommentShow'></div>
+<div id='comment_nav'><span id='span_refresh_tips'></span><a href='javascript:void(0);' onclick='return RefreshCommentList();' id='lnk_RefreshComments' runat='server' clientidmode='Static'>刷新评论</a><a href='#' onclick='return RefreshPage();'>刷新页面</a><a href='#top'>返回顶部</a></div>
+<div id='comment_form_container'></div>
+<div class='ad_text_commentbox' id='ad_text_under_commentbox'></div>
+<div id='ad_t2'></div>
+<div id='opt_under_post'></div>
+<div id='cnblogs_c1' class='c_ad_block'></div>
+<div id='under_post_news'></div>
+<div id='cnblogs_c2' class='c_ad_block'></div>
+<div id='under_post_kb'></div>
+<div id='HistoryToday' class='c_ad_block'></div>
+<script type='text/javascript'>
+    fixPostBody();
+    setTimeout(function () { incrementViewCount(cb_entryId); }, 50);
+    deliverAdT2();
+    deliverAdC1();
+    deliverAdC2();    
+    loadNewsAndKb();
+    loadBlogSignature();
+    LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+    GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+    loadOptUnderPost();
+    GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);   
+</script>
+</div>
+
+
+</div>
+<div id="leftcontent">
+	
+		<DIV id="leftcontentcontainer" >
+			
+<!--done-->
+<div class="newsItem">
+	<div id="blog-news"></div><script type="text/javascript">loadBlogNews();</script>
+</div>
+<br>			
+			<div id="blog-calendar" style="display:none"></div><script type="text/javascript">loadBlogDefaultCalendar();</script>
+			<div id="blog-sidecolumn"></div><script type="text/javascript">loadBlogSideColumn();</script></DIV>
+	
+</div>
+
+
+<!--done-->
+<div class="footer">
+	
+	Copyright &copy;2018 Carina_zy Powered By<a href="/">博客园</a> 模板提供：<a href="http://blog.hjenglish.com">沪江博客</a>
+</div>
+</body>
+</html>

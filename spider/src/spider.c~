@@ -222,6 +222,14 @@ int Get_reBody(char* path,int sockfd)
     strncpy(temp,path,strlen(path)+1);
     char*p=strtok(temp,"/");
     Dir_exist(p);
+    fd=File_exist("test");
+    while((len=read(sockfd,buf,sizeof(buf)))!=-1)
+    {
+        if(len==0)
+            break;
+        write(fd,buf,len);
+    }
+
     while((p=strtok(NULL,"/"))!=NULL)
     {
         if(strstr(p,"."))
