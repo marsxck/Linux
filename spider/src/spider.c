@@ -212,6 +212,7 @@ int  File_exist(char* filename)
 int Get_reBody(char* path,int sockfd)
 {
     //创建目录 ex:www.baidu.com/s/s/s.jpg
+    int flag=1;
     char pwd[1024]={0};
     getcwd(pwd,sizeof(pwd));
     chdir("res");
@@ -226,6 +227,7 @@ int Get_reBody(char* path,int sockfd)
     {
         if(strstr(p,"."))
         {
+           flag=0;
            if((fd=File_exist(p))==-1)
            {
                printf("已经获取过%s\n",p);
@@ -245,6 +247,22 @@ int Get_reBody(char* path,int sockfd)
         else
         {
             Dir_exist(p);
+        }
+    }
+    if(flag==1)//需要下载网页
+    {
+        if((fd=File_exist("index.html"))==-1)
+        {
+            printf("网页重复\n");
+        }
+        else
+        {    
+            while((len=read(sockfd,buf,sizeof(buf)))!=-1)
+            {
+                if(len==0)
+                    break;
+                write(fd,buf,len);
+            }
         }
     }
     chdir(pwd);
