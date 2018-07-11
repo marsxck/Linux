@@ -227,10 +227,13 @@ int Get_reBody(char* path,int sockfd)
         if(strstr(p,"."))
         {
            if((fd=File_exist(p))==-1)
+           {
+               printf("已经获取过%s\n",p);
                break;
+           }
            else
            {
-                printf("开始下载资源\n");
+                printf("开始下载资源%s\n",p);
                 while((len=read(sockfd,buf,sizeof(buf)))!=-1)
                 {
                     if(len==0)
@@ -247,7 +250,7 @@ int Get_reBody(char* path,int sockfd)
     chdir(pwd);
     close(fd);
     close(sockfd);
-    printf("获取完成\n");
+    printf("获取结束\n");
     return 0;
 }
 

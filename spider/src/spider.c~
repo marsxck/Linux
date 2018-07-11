@@ -214,6 +214,7 @@ int Get_reBody(char* path,int sockfd)
     //创建目录 ex:www.baidu.com/s/s/s.jpg
     char pwd[1024]={0};
     getcwd(pwd,sizeof(pwd));
+    chdir("res");
     char temp[1024]={0};
     char buf[1024]={0};
     int fd=0;
@@ -226,10 +227,13 @@ int Get_reBody(char* path,int sockfd)
         if(strstr(p,"."))
         {
            if((fd=File_exist(p))==-1)
+           {
+               printf("已经获取过%s\n",p);
                break;
+           }
            else
            {
-                printf("开始下载资源\n");
+                printf("开始下载资源%s\n",p);
                 while((len=read(sockfd,buf,sizeof(buf)))!=-1)
                 {
                     if(len==0)
@@ -246,7 +250,7 @@ int Get_reBody(char* path,int sockfd)
     chdir(pwd);
     close(fd);
     close(sockfd);
-    printf("获取完成\n");
+    printf("获取结束\n");
     return 0;
 }
 
@@ -261,7 +265,6 @@ int main()
     strncpy(pUrl->url,value,strlen(value)-1);
     if(Url_analytic(pUrl))
         printf("URL analy error");
-    printf("%s\n%s\n%s\n%d\n%s\n",pUrl->url,pUrl->domain,pUrl->path,pUrl->port,pUrl->ip);
     sockfd=Connect(pUrl);
     head=Create_http_head(pUrl);
     printf("%s",head);
