@@ -8,11 +8,11 @@
 #include<sys/types.h>
 #include<sys/socket.h>
 #include<netinet/in.h>
-#include<sys/states.h>
+#include<sys/stat.h>
 #include<fcntl.h>
 #define URLSIZE 1024
 #define DOMAIN 128
-#define IP     16
+#define IP     16 
 #define NAME   1024
 typedef struct{
     char url[URLSIZE];//配置文件获取

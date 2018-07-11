@@ -142,12 +142,11 @@ char* Get_reHead(int sockfd,char* head)
 {
     char buf[1024];
     char rebuf[1024];
-    char recvbuf[1024];
     char* temp;
-    int res;
+    //int res;
     int j=0;
-    int fd;
-    int len;
+    //int fd;
+    //int len;
     bzero(buf,sizeof(buf));
     bzero(rebuf,sizeof(rebuf));
     write(sockfd,head,strlen(head));
@@ -164,21 +163,94 @@ char* Get_reHead(int sockfd,char* head)
     }
     temp=(char*)malloc(strlen(rebuf)+1);
     free(head);
-    strncpy(temp,rebuf,strlen(rebuf));
-    fd=open("./res/sss.html",O_WRONLY|O_CREAT,0755);
-    printf("%s",temp);
-    while((len=read(sockfd,recvbuf,sizeof(recvbuf)))!=-1)
-    {
-        printf("%d\n",len);
-        if(len==0)
-            break;
-        write(fd,recvbuf,len);
-    }
-    close(fd);
-    close(sockfd);
-    printf("download finish\n");
+    strncpy(temp,rebuf,strlen(rebuf)+1);
+    //fd=open("./res/sss.html",O_WRONLY|O_CREAT,0755);
+    //printf("%s",temp);
+    //while((len=read(sockfd,recvbuf,sizeof(recvbuf)))!=-1)
+    //{
+    //    printf("%d\n",len);
+    //    if(len==0)
+    //        break;
+    //    write(fd,recvbuf,len);
+    //}
+    //close(fd);
+    //close(sockfd);
+    //printf("download finish\n");
     return temp;
 }
+//判断目录是否存在
+int Dir_exist(char* dir)
+{
+    //是否存在该目录
+    DIR* p;
+    umask(0);
+    p=opendir(dir);
+    if(p!=NULL)
+    {
+        closedir(p);
+        chdir(dir);
+        return -1;
+    }
+    mkdir(dir,0775);
+    chdir(dir);
+    return 0;
+}
+//判断文件是否存在
+int  File_exist(char* filename)
+{
+    int flag=access(filename,F_OK);
+    //存在则忽略
+    if(flag==0)
+    {
+        return -1;
+    }
+    //不存在创建
+    flag=open(filename,O_WRONLY|O_CREAT,0755);
+    return flag;
+}
+//获取相应体（资源）到对应目录
+int Get_reBody(char* path,int sockfd)
+{
+    //创建目录 ex:www.baidu.com/s/s/s.jpg
+    char pwd[1024]={0};
+    getcwd(pwd,sizeof(pwd));
+    chdir("res");
+    char temp[1024]={0};
+    char buf[1024]={0};
+    int fd=0;
+    int len;
+    strncpy(temp,path,strlen(path)+1);
+    char*p=strtok(temp,"/");
+    Dir_exist(p);
+    while((p=strtok(NULL,"/"))!=NULL)
+    {
+        if(strstr(p,"."))
+        {
+           if((fd=File_exist(p))==-1)
+               break;
+           else
+           {
+                printf("开始下载资源\n");
+                while((len=read(sockfd,buf,sizeof(buf)))!=-1)
+                {
+                    if(len==0)
+                        break;
+                    write(fd,buf,len);
+                }
+           }
+        }
+        else
+        {
+            Dir_exist(p);
+        }
+    }
+    chdir(pwd);
+    close(fd);
+    close(sockfd);
+    printf("获取完成\n");
+    return 0;
+}
+
 int main()
 {
     int sockfd;
@@ -190,12 +262,12 @@ int main()
     strncpy(pUrl->url,value,strlen(value)-1);
     if(Url_analytic(pUrl))
         printf("URL analy error");
-    printf("%s\n%s\n%s\n%d\n%s\n",pUrl->url,pUrl->domain,pUrl->path,pUrl->port,pUrl->ip);
     sockfd=Connect(pUrl);
     head=Create_http_head(pUrl);
     printf("%s",head);
     rehead=Get_reHead(sockfd,head);
     printf("%s",rehead);
+    Get_reBody(pUrl->path,sockfd);
     free(pUrl);
     return 0;
 }
