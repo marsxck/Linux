@@ -101,7 +101,7 @@ int Get_ip(url_t* u)
 int Connect(url_t* u)
 {
     if(u==NULL) return -1;
-    printf("连接%s:%d %s中.....\n",u->domain,u->port,u->ip);
+    printf("连接%s中.....\n",u->domain);
     int socketfd;
     int res;
     socketfd=socket(AF_INET,SOCK_STREAM,0);
@@ -121,8 +121,67 @@ int Connect(url_t* u)
     }
     return socketfd;
 }
+//创建http请求头
+char* Create_http_head(url_t* u)
+{
+    char head[1024];
+    char* temp;
+    sprintf(head,"GET %s HTTP/1.1\r\n"\
+            "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\n"\
+            "User-Agent:Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537(KHTML, like Gecko) Chrome/47.0.2525Sagari/537.36\r\n"\
+            "Host:%s\r\n"\
+            "Connection:close\r\n"\
+            "\r\n",u->url,u->domain);
+    //printf("%s",head);
+    temp=(char*)malloc(sizeof(char)*strlen(head)+1);
+    strcpy(temp,head);
+    return temp;
+}
+//获取响应头
+char* Get_reHead(int sockfd,char* head)
+{
+    char buf[1024];
+    char rebuf[1024];
+    char recvbuf[1024];
+    char* temp;
+    int res;
+    int j=0;
+    int fd;
+    int len;
+    bzero(buf,sizeof(buf));
+    bzero(rebuf,sizeof(rebuf));
+    write(sockfd,head,strlen(head));
+    int flag=0;
+    while(read(sockfd,buf,1)!=-1)
+    {
+        rebuf[j++]=buf[0];
+        if(buf[0]=='\r'||buf[0]=='\n')
+            flag++;
+        else
+            flag=0;
+        if(flag==4)
+            break;
+    }
+    temp=(char*)malloc(strlen(rebuf)+1);
+    free(head);
+    strncpy(temp,rebuf,strlen(rebuf));
+    fd=open("./res/sss.html",O_WRONLY|O_CREAT,0755);
+    printf("%s",temp);
+    while((len=read(sockfd,recvbuf,sizeof(recvbuf)))!=-1||len!=0)
+    {
+        printf("%d\n",len);
+        write(fd,recvbuf,len);
+    }
+    close(fd);
+    close(sockfd);
+    printf("download finish\n");
+    return temp;
+}
 int main()
 {
+    int sockfd;
+    char* head;
+    char* rehead;
     char* value=Load_Config("./conf/spider.ini","URL");
     url_t *pUrl=(url_t*)malloc(sizeof(url_t));
     Init_Url_t(pUrl);
@@ -130,7 +189,11 @@ int main()
     if(Url_analytic(pUrl))
         printf("URL analy error");
     printf("%s\n%s\n%s\n%d\n%s\n",pUrl->url,pUrl->domain,pUrl->path,pUrl->port,pUrl->ip);
-    Connect(pUrl);
+    sockfd=Connect(pUrl);
+    head=Create_http_head(pUrl);
+    printf("%s",head);
+    rehead=Get_reHead(sockfd,head);
+    printf("%s",rehead);
     free(pUrl);
     return 0;
 }
