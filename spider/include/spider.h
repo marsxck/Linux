@@ -11,6 +11,8 @@
 #include<sys/stat.h>
 #include<fcntl.h>
 #include<dirent.h>
+#include<sys/mman.h>
+#include<regex.h>
 #define URLSIZE 1024
 #define DOMAIN 128
 #define IP     16 
@@ -32,3 +34,4 @@ int Get_reBody(char*,int);//读取响应体
 char* Load_Config(char*,char*);//读配置文件
 int Dir_exist(char*);//判断目录是否存在
 int File_exist(char* dir);//判断文件是否存在
+int Html_analytic(char*);//解析html模块

@@ -10,6 +10,8 @@
 #include<netinet/in.h>
 #include<sys/stat.h>
 #include<fcntl.h>
+#include<dirent.h>
+#include<sys/mman.h>
 #define URLSIZE 1024
 #define DOMAIN 128
 #define IP     16 
@@ -27,5 +29,8 @@ int Get_ip(url_t*);//获取域名ip
 char* Create_http_head(url_t*);//创建HTTP请求头
 int Connect(url_t*);//连接webserver
 char* Get_reHead(int ,char*);//获取响应头
-int Get_reBody(char*,url_t*);//读取响应体
+int Get_reBody(char*,int);//读取响应体
 char* Load_Config(char*,char*);//读配置文件
+int Dir_exist(char*);//判断目录是否存在
+int File_exist(char* dir);//判断文件是否存在
+int Html_analytic(char*);//解析html模块

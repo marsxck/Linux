@@ -271,24 +271,65 @@ int Get_reBody(char* path,int sockfd)
     printf("获取结束\n");
     return 0;
 }
-
+//html解析器
+int Html_analytic(char*path)
+{
+    if(path==NULL)
+        return -1;
+    int size,fd;
+    char url[1024]={0};
+    char title[1024]={0};
+    char* jsrc;
+    regex_t regx;
+    regmatch_t math[3];
+    fd=open(path,O_RDONLY);
+    size=lseek(fd,0,SEEK_END);
+    printf("%d\n",size);
+    if(size==-1)
+        return -1;
+    if(fd==-1)
+        return -1;
+    char* src=(char*)mmap(NULL,size,PROT_READ,MAP_SHARED,fd,0);
+    close(fd);
+    jsrc=src;
+    //正则匹配
+    printf("开始匹配\n");
+    regcomp(&regx,"<a[^>]\\+\\?href=\"\\([^\"]\\+\\?\\)\"[^>]\\+\\?>\\([^<]\\+\\?\\)</a>",0);    
+    while(regexec(&regx,src,3,math,0)==0)
+    {
+        //printf("匹配成功");
+        bzero(url,1024);
+        bzero(title,1024);
+        //strncpy(url,src+math[1].rm_so,math[1].rm_eo-math[1].rm_so);
+        //strncpy(title,src+math[2].rm_so,math[2].rm_eo-math[2].rm_so);
+        snprintf(url,math[1].rm_eo-math[1].rm_so+1,"%s",src+math[1].rm_so);
+        snprintf(title,math[2].rm_eo-math[2].rm_so+1,"%s",src+math[2].rm_so);
+        printf("%s\n",url);
+        printf("%s\n",title);
+        src+=math[0].rm_eo;
+    }
+    munmap(jsrc,size);
+    regfree(&regx);
+    return 0;
+}
 int main()
 {
-    int sockfd;
-    char* head;
-    char* rehead;
-    char* value=Load_Config("./conf/spider.ini","URL");
-    url_t *pUrl=(url_t*)malloc(sizeof(url_t));
-    Init_Url_t(pUrl);
-    strncpy(pUrl->url,value,strlen(value)-1);
-    if(Url_analytic(pUrl))
-        printf("URL analy error");
-    sockfd=Connect(pUrl);
-    head=Create_http_head(pUrl);
-    printf("%s",head);
-    rehead=Get_reHead(sockfd,head);
-    printf("%s",rehead);
-    Get_reBody(pUrl->path,sockfd);
-    free(pUrl);
+    //int sockfd;
+    //char* head;
+    //char* rehead;
+    //char* value=Load_Config("./conf/spider.ini","URL");
+    //url_t *pUrl=(url_t*)malloc(sizeof(url_t));
+    //Init_Url_t(pUrl);
+    //strncpy(pUrl->url,value,strlen(value)-1);
+    //if(Url_analytic(pUrl))
+        //printf("URL analy error");
+    //sockfd=Connect(pUrl);
+    //head=Create_http_head(pUrl);
+    //printf("%s",head);
+    //rehead=Get_reHead(sockfd,head);
+    //printf("%s",rehead);
+    //Get_reBody(pUrl->path,sockfd);
+    //free(pUrl);
+    Html_analytic("./res/www.hrbust.edu.cn/index.html");
     return 0;
 }
